@@ -1,0 +1,71 @@
+
+create_project project_1 myproj -part {{part_number}}
+
+# Tcl files
+{% for tcl_file in tcl_files %}source {{tcl_file}}
+{% endfor %}
+
+# Verilog files
+{% if sv_files|length > 0 %}
+read_verilog -library xil_defaultlib -sv {
+  {% for sv_file in sv_files %}{{sv_file}}
+  {% endfor %}
+}
+{% endif %}
+
+set_property top {{top_module}} [current_fileset]
+
+# Constraints
+{% for xdc_file in xdc_files %}read_xdc {{xdc_file}}
+{% endfor %}
+
+foreach bd [get_files -quiet "*.bd"] {
+  if {![get_property IS_GENERATED $bd]} {
+    generate_target all $bd
+    create_ip_run $bd
+  }
+}
+
+set run_synth [get_runs "synth_1"]
+set run_list [get_runs -quiet \
+            -filter "IS_SYNTHESIS == true && NAME != $run_synth"]
+
+
+if {[llength $run_list] != 0} {
+  foreach run $run_list {
+      reset_run $run
+  }
+  launch_runs $run_list -jobs {{jobs}}
+  foreach run $run_list {
+    wait_on_run $run
+    if {[get_property PROGRESS $run] != "100%"} {
+        puts "ERROR: OOC Synthesis of ${run} failed"
+        exit 2
+    }
+  }
+}
+
+launch_runs $run_synth -jobs {{jobs}}
+wait_on_run $run_synth
+if {[get_property PROGRESS $run_synth] != "100%"} {
+  puts "ERROR: Synthesis failed"
+  exit 2
+}
+
+open_run "synth_1"
+write_checkpoint -force -noxdef {{synth_dcp}}
+
+# TODO(stridge-cruxml) Create Synth reports.
+
+set run_impl [get_runs "impl_1"]
+launch_runs $run_impl -jobs {{jobs}}
+wait_on_run $run_impl
+if {[get_property PROGRESS $run_impl] != "100%"} {
+  puts "ERROR: Routing failed"
+  exit 2
+}
+
+open_run "impl_1"
+write_checkpoint -force -noxdef {{route_dcp}}
+
+write_bitstream -force {{bitstream}}

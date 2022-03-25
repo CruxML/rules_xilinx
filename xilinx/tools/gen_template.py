@@ -36,10 +36,22 @@ if __name__ == "__main__":
         help="The top level module to synthesize.",
     )
     parser.add_argument(
-        "--output_dcp",
+        "--synth_dcp",
         action="store",
         required=True,
-        help="The output dcp filename.",
+        help="The output dcp filename for synthesis.",
+    )
+    parser.add_argument(
+        "--route_dcp",
+        action="store",
+        required=True,
+        help="The output dcp filename for routing.",
+    )
+    parser.add_argument(
+        "--bitstream",
+        action="store",
+        required=True,
+        help="The bitstream output.",
     )
     parser.add_argument(
         "-o",
@@ -55,13 +67,16 @@ if __name__ == "__main__":
 
     options = parser.parse_args()
 
-    template_file = os.path.join(os.path.dirname(__file__), "run_synth.tcl.jinja")
+    template_file = os.path.join(os.path.dirname(__file__), "run.tcl.jinja")
     template_params = {
         "sv_files": options.sv_files if options.sv_files else [],
         "xdc_files": options.xdc_files if options.xdc_files else [],
         "tcl_files": options.tcl_files if options.tcl_files else [],
         "top_module": options.top_module,
         "part_number": options.part_number,
-        "output_dcp": options.output_dcp,
+        "synth_dcp": options.synth_dcp,
+        "route_dcp": options.route_dcp,
+        "bitstream": options.bitstream,
+        "jobs": 4,
     }
     generate_from_template(options.output_file, template_file, template_params)

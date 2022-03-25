@@ -1,11 +1,11 @@
 load("@pip//:requirements.bzl", "requirement")
 
-exports_files(["run_synth.tcl.jinja"])
+exports_files(["run.tcl.jinja"])
 
 py_binary(
-    name = "synth_template",
-    srcs = ["synth_template.py"],
-    data = [":run_synth.tcl.jinja"],
+    name = "gen_template",
+    srcs = ["gen_template.py"],
+    data = [":run.tcl.jinja"],
     visibility = ["//visibility:public"],
     deps = [
         requirement("jinja2"),
