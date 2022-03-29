@@ -1,5 +1,6 @@
 load("@rules_verilog//verilog:defs.bzl", "verilog_module")
-load("@com_cruxml_rules_xilinx//xilinx:defs.bzl", "vivado_bitstream")
+load("@com_cruxml_rules_xilinx//xilinx:defs.bzl", "vitis_generate", "vivado_bitstream")
+load("@rules_verilator//verilator:defs.bzl", "verilator_cc_library")
 
 exports_files([
     "some_bd.tcl",
@@ -18,4 +19,58 @@ vivado_bitstream(
     module = ":empty_top",
     part_number = "xczu28dr-ffvg1517-2-e",
     xilinx_env = "//tests:xilinx_env.sh",
+)
+
+cc_library(
+    name = "hls_adder",
+    srcs = ["hls_adder.cc"],
+    hdrs = ["hls_adder.h"],
+    deps = ["//vitis:v2021_2_cc"],
+)
+
+cc_test(
+    name = "hls_adder_test",
+    srcs = ["hls_adder_test.cc"],
+    deps = [
+        ":hls_adder",
+        "@com_github_google_glog//:glog",
+        "@gtest",
+        "@gtest//:gtest_main",
+    ],
+)
+
+vitis_generate(
+    name = "gen_adder",
+    out = "adder.tar.gz",
+    clock_period = "10.0",
+    top_func = "adder",
+    xilinx_env = "//tests:xilinx_env.sh",
+    deps = [":hls_adder"],
+)
+
+# Extract adder.tar.gz to adder/ and create a rule like this.
+# This allows systems without access to vitis to still use the generated code.
+verilog_module(
+    name = "adder",
+    srcs = glob(["adder/*"]),
+    top = "adder",
+)
+
+verilator_cc_library(
+    name = "adder_verilator",
+    module = ":adder",
+    # Disable all warnings for HLS generated verilog.
+    vopts = [],
+)
+
+cc_test(
+    name = "hls_adder_verilator_test",
+    srcs = ["hls_adder_verilator_test.cc"],
+    deps = [
+        ":adder_verilator",
+        ":hls_adder",
+        "@com_github_google_glog//:glog",
+        "@gtest",
+        "@gtest//:gtest_main",
+    ],
 )

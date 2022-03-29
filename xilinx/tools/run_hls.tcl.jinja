@@ -1,0 +1,22 @@
+
+# Create a project.
+open_project -reset {{ project_name }}
+
+# The source files. Also define VITIS with cflags.
+{% for input_file in files %}
+add_files {{ input_file }} -cflags -DVITIS=1
+{% endfor %}
+
+# Specify the top-level function for synthesis
+set_top {{ top_level_function }}
+
+# Create solution1
+open_solution -reset sol1
+
+# Specify a Xilinx device and clock period
+set_part  { {{ part_number }} }
+create_clock -period {{ clock_period }}
+
+# Generate the verilog.
+csynth_design
+
