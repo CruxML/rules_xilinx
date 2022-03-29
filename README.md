@@ -5,7 +5,7 @@ Bazel rules to interface to xilinx tools such as vivado, vitis_hls and xsim (cur
 ## Getting Started
 
 To your `WORKSPACE` file add:
-```
+```bzl
 git_repository(
     name = "com_cruxml_rules_xilinx",
     commit = "245e1d67ebbcdf86a9a8c524f6d75d4f3c7342c9",
@@ -26,7 +26,7 @@ rules_xilinx_deps_3()
 ```
 
 Create a Vivado bitstream with:
-```
+```bzl
 load("@rules_verilog//verilog:defs.bzl", "verilog_module")
 load("@com_cruxml_rules_xilinx//xilinx:defs.bzl", "vivado_bitstream")
 
@@ -47,9 +47,78 @@ vivado_bitstream(
 )
 ```
 
-Note the `xilinx_env` key word provides a script to source settings and set the license variables you wish to use.
+Note the `xilinx_env` argument provides a script to source settings and set the vivado license variables you wish to use.
 
-See the `tests` directory for more examples, including HLS examples.
+For hls:
+
+```bzl
+# Define the hls lib. This will grab the includes from this repo.
+cc_library(
+    name = "hls_adder",
+    srcs = ["hls_adder.cc"],
+    hdrs = ["hls_adder.h"],
+    deps = ["@com_cruxml_rules_xilinx//vitis:v2021_2_cc"],
+)
+
+# Define a C++ test on the HLS.
+cc_test(
+    name = "hls_adder_test",
+    srcs = ["hls_adder_test.cc"],
+    deps = [
+        ":hls_adder",
+        "@com_github_google_glog//:glog",
+        "@gtest",
+        "@gtest//:gtest_main",
+    ],
+)
+
+# Make a target to generate the verilog with vitis.
+# Note the xilinx_env.sh file sources the settings64.sh in Vitis.
+# It generates adder.tar.gz, the generated verilog.
+vitis_generate(
+    name = "gen_adder",
+    out = "adder.tar.gz",
+    clock_period = "10.0",
+    top_func = "adder",
+    xilinx_env = "//tests:xilinx_env.sh",
+    deps = [":hls_adder"],
+)
+
+# Extract adder.tar.gz to adder/ and create a rule like this.
+# This allows systems without access to vitis to still use the generated code.
+# Alternatively you could make a rule to extract the tar.gz too, to avoid checking in
+# generated code.
+verilog_module(
+    name = "adder",
+    srcs = glob(["adder/*"]),
+    top = "adder",
+)
+
+# Compile a verilator module using the generated verilog.
+verilator_cc_library(
+    name = "adder_verilator",
+    module = ":adder",
+    # Disable all warnings for HLS generated verilog.
+    vopts = [],
+)
+
+# Add a test on the verilated module. Also depends on the
+# original module to compare the SW and HW versions.
+cc_test(
+    name = "hls_adder_verilator_test",
+    srcs = ["hls_adder_verilator_test.cc"],
+    deps = [
+        ":adder_verilator",
+        ":hls_adder",
+        "@com_github_google_glog//:glog",
+        "@gtest",
+        "@gtest//:gtest_main",
+    ],
+)
+```
+
+
+See the `tests` directory for more working examples.
 
 ## Design for Vivado
 
@@ -71,11 +140,22 @@ It is intended to implement customizable report parsers evaluate vivado output t
 ## Design for Vitis
 
 Vitis has a bunch of files to include that define HLS primitives. These files are added directly into this repo.
-They can be dependency targets for tests. Define in the vitis script the variable VITIS to allow ifdef includes.
+They can be dependency targets for cpp tests. By adding a dependency on `@com_cruxml_rules_xilinx//vitis:v2021_2_cc` you can
+include deps as follows:
+
+```cpp
+#ifdef VITIS
+#include <ap_fixed.h>
+#else
+#include "vitis/v2021_2/ap_fixed.h"
+#endif
+```
+
+`VITIS` is defined during verilog generation with vitis where the includes are built in.
 
 ## Design for xsim
 
-TODO(stridge-cruxml)
+TODO(stridge-cruxml) Add rules to run xsim.
 
 ## Known Issues
 
