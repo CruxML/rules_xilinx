@@ -2,7 +2,7 @@
 
 Bazel rules to interface to xilinx tools such as vivado, vitis_hls and xsim (currently not implemented).
 
-## How to use
+## Getting Started
 
 To your `WORKSPACE` file add:
 ```
@@ -25,7 +25,31 @@ load("@com_cruxml_rules_xilinx//xilinx:rules_xilinx_deps_3.bzl", "rules_xilinx_d
 rules_xilinx_deps_3()
 ```
 
-See the `tests` directory for example usage.
+Create a Vivado bitstream with:
+```
+load("@rules_verilog//verilog:defs.bzl", "verilog_module")
+load("@com_cruxml_rules_xilinx//xilinx:defs.bzl", "vivado_bitstream")
+
+verilog_module(
+    name = "some_module",
+    srcs = ["some_module.sv"],
+    top = "some_module",
+    deps = [":other", ":modules"],
+)
+
+vivado_bitstream(
+    name = "gen_some_module",
+    board_designs = [":some_bd.tcl"],
+    constraints = ["//path/to:constraints.xdc"],
+    module = ":some_module",
+    part_number = "xczu28dr-ffvg1517-2-e",
+    xilinx_env = "//path/to:xilinx_env.sh",
+)
+```
+
+Note the `xilinx_env` key word provides a script to source settings and set the license variables you wish to use.
+
+See the `tests` directory for more examples, including HLS examples.
 
 ## Design for Vivado
 

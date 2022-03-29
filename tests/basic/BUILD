@@ -10,6 +10,7 @@ verilog_module(
     name = "empty_top",
     srcs = ["empty_top.sv"],
     top = "empty_top",
+    deps = [":adder"],
 )
 
 vivado_bitstream(
