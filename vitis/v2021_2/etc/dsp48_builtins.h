@@ -55,9 +55,9 @@
 #ifndef _DSP48_BUILTINS_H_
 #define _DSP48_BUILTINS_H_
 #ifdef __DSP48E1__
-#include "vitis/v2012_2/etc/dsp48e1_builtins.h"
+#include "vitis/v2021_2/etc/dsp48e1_builtins.h"
 #elif __DSP48E2__
-#include "vitis/v2012_2/etc/dsp48e2_builtins.h"
+#include "vitis/v2021_2/etc/dsp48e2_builtins.h"
 #else
 #error Please select a proper device to use dsp builtins.
 #endif

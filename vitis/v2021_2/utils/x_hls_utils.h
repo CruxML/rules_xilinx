@@ -32,8 +32,8 @@
 
 #ifndef X_HLS_UTILS_H
 #define X_HLS_UTILS_H
-#include "vitis/v2012_2/ap_fixed.h"
-#include "vitis/v2012_2/hls_half.h"
+#include "vitis/v2021_2/ap_fixed.h"
+#include "vitis/v2021_2/hls_half.h"
 #include <limits>
 #include <stdint.h>
 #ifndef __SYNTHESIS__

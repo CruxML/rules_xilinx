@@ -33,10 +33,10 @@
 #ifndef X_HLS_TRAITS_H
 #define X_HLS_TRAITS_H
 
-#include "vitis/v2012_2/ap_fixed.h"
-#include "vitis/v2012_2/ap_int.h"
-#include "vitis/v2012_2/hls_half.h"
-#include "vitis/v2012_2/hls_x_complex.h"
+#include "vitis/v2021_2/ap_fixed.h"
+#include "vitis/v2021_2/ap_int.h"
+#include "vitis/v2021_2/hls_half.h"
+#include "vitis/v2021_2/hls_x_complex.h"
 #include "x_hls_defines.h"
 #include "x_hls_utils.h"
 #include <stdint.h>

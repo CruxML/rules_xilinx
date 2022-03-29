@@ -55,8 +55,8 @@
 #ifndef _AUTOPILOT_APINT_H_
 #define _AUTOPILOT_APINT_H_
 
-#include "vitis/v2012_2/etc/autopilot_dt.h"
-#include "vitis/v2012_2/etc/autopilot_ssdm_bits.h"
+#include "vitis/v2021_2/etc/autopilot_dt.h"
+#include "vitis/v2021_2/etc/autopilot_ssdm_bits.h"
 
 #define APInt_BitWidthOf(X) _ssdm_op_bitwidthof(X)
 

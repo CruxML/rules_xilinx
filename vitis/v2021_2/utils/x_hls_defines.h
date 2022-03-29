@@ -37,7 +37,7 @@
 #ifndef X_HLS_DEFINES_H
 #define X_HLS_DEFINES_H
 
-#include "vitis/v2012_2/ap_int.h"
+#include "vitis/v2021_2/ap_int.h"
 #include "hls_version.h"
 
 /*
