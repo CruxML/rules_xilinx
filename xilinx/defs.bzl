@@ -121,6 +121,7 @@ def _vivado_bitstream_impl(ctx):
     route_dcp = ctx.actions.declare_file("{}_route.dcp".format(ctx.label.name))
     bitstream = ctx.actions.declare_file("{}.bit".format(ctx.label.name))
     vivado_log = ctx.actions.declare_file("{}.log".format(ctx.label.name))
+    hw_platform = ctx.actions.declare_file("{}.xsa".format(ctx.label.name))
     run_tcl = ctx.actions.declare_file("run.tcl")
 
     args = []
@@ -153,6 +154,8 @@ def _vivado_bitstream_impl(ctx):
     args.append(bitstream.path)
     args.append("--output_file")
     args.append(run_tcl.path)
+    args.append("--hw_platform")
+    args.append(hw_platform.path)
 
     ctx.actions.run(
         outputs = [run_tcl],
@@ -171,7 +174,7 @@ def _vivado_bitstream_impl(ctx):
     command += "vivado -mode batch -source " + run_tcl.path + " -log " + vivado_log.path
 
     ctx.actions.run_shell(
-        outputs = [synth_dcp, route_dcp, bitstream, vivado_log],
+        outputs = [synth_dcp, route_dcp, bitstream, vivado_log, hw_platform],
         inputs = ctx.attr.module[VerilogModuleInfo].files.to_list() + ctx.files.board_designs + ctx.files.constraints + [run_tcl, xilinx_env],
         command = command,
         mnemonic = "VivadoRun",
@@ -180,7 +183,7 @@ def _vivado_bitstream_impl(ctx):
     )
 
     return [
-        DefaultInfo(files = depset([synth_dcp, route_dcp, bitstream, vivado_log])),
+        DefaultInfo(files = depset([synth_dcp, route_dcp, bitstream, vivado_log, hw_platform])),
         VivadoInfo(part = ctx.attr.part_number),
     ]
 

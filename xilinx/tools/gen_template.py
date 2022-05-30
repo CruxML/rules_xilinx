@@ -54,6 +54,12 @@ if __name__ == "__main__":
         help="The bitstream output.",
     )
     parser.add_argument(
+        "--hw_platform",
+        action="store",
+        required=True,
+        help="The xsa output.",
+    )
+    parser.add_argument(
         "-o",
         "--output_file",
         action="store",
@@ -77,6 +83,7 @@ if __name__ == "__main__":
         "synth_dcp": options.synth_dcp,
         "route_dcp": options.route_dcp,
         "bitstream": options.bitstream,
+        "hw_platform": options.hw_platform,
         "jobs": 4,
     }
     generate_from_template(options.output_file, template_file, template_params)
