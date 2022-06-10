@@ -75,3 +75,26 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+verilog_module(
+    name = "load_data",
+    srcs = ["load_data.sv"],
+    data = ["some_data.dat"],
+    top = "load_data",
+)
+
+verilator_cc_library(
+    name = "load_data_verilator",
+    module = ":load_data",
+)
+
+cc_test(
+    name = "load_data_test",
+    srcs = ["load_data_test.cc"],
+    deps = [
+        ":load_data_verilator",
+        "@com_github_google_glog//:glog",
+        "@gtest",
+        "@gtest//:gtest_main",
+    ],
+)
