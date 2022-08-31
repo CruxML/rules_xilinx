@@ -135,6 +135,8 @@ def _vivado_generate_impl(ctx):
     args.append(ctx.attr.part_number)
     args.append("-o")
     args.append(output_file.path)
+    args.append("--cflags")
+    args.append(ctx.attr.cflags)
 
     ctx.actions.run(
         outputs = [output_file],
@@ -183,6 +185,7 @@ vivado_generate = rule(
             allow_files = [".sh"],
             mandatory = True,
         ),
+        "cflags": attr.string(doc = "The compiler flags.", default = "-DVITIS=1"),
     },
 )
 
