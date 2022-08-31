@@ -638,7 +638,7 @@ struct ssdm_int_sim {
 };
 #define _AP_ROOT_TYPE ssdm_int_sim
 // private's ref uses _AP_ROOT_TYPE.
-#include <etc/ap_private.h>
+#include "etc/ap_private.h"
 // XXX The C-sim model cannot use GCC-extension
 // Basic ops. Ret and Val are ap_private.
 template <typename _Tp1, typename _Tp2, typename _Tp3>
