@@ -1,7 +1,7 @@
 cc_library(
-    name = "v2021_2_cc",
+    name = "v2020_1_cc",
     srcs = glob([
-        "v2021_2/**/*.h",
+        "v2020_1/**/*.h",
     ]),
     strip_include_prefix = "external/com_cruxml_rules_xilinx/",
     visibility = ["//visibility:public"],
