@@ -39,8 +39,8 @@
 #define _X_HLS_ALG_TYPES_H_
 
 #if 0
-#include <ap_int.h>
-#include <ap_fixed.h>
+#include "ap_int.h"
+#include "ap_fixed.h"
 #endif
 
 // Fixed width integers

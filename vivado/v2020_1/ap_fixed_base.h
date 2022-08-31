@@ -59,7 +59,7 @@
 #endif
 
 // for ap_int_base and its reference types.
-#include <ap_int.h>
+#include "ap_int.h"
 #ifndef __SYNTHESIS__
 // for half type
 #include <hls_half.h>

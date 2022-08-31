@@ -140,12 +140,12 @@ typedef uint64_t xuint64;
    it also provides a gmp.h header file to allow MPIR and GMP to be easily interchanged.
    Select the correct gmp.h by setting the -I option (includes path) for your compiler. */
 #ifndef __GMP_H__
-#include <gmp.h>
+#include "gmp.h"
 #endif
 
 /* Check if MPFR is included, and try to include it (Works with local MPFR) */
 #ifndef __MPFR_H
-#include <mpfr.h>
+#include "mpfr.h"
 #endif
 
 /* Precision of mantissa or exponent (bits) */

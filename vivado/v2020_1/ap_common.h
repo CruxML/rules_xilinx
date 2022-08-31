@@ -54,7 +54,7 @@
 
 // ----------------------------------------------------------------------
 
-#include <ap_decl.h>
+#include "ap_decl.h"
 
 // Macro functions
 #define AP_MAX(a, b) ((a) > (b) ? (a) : (b))

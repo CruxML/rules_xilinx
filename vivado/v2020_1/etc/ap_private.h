@@ -87,7 +87,7 @@ typedef unsigned __int64 uint64_t;
 #endif
 
 // FIXME eventually, this should have nothing to do with half.
-#include "hls_half.h"
+#include "vivado/v2020_1/hls_half.h"vivado/v2020_1/
 
 #ifndef INLINE
 #define INLINE inline

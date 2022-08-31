@@ -34,7 +34,7 @@
 #include "ap_fixed.h"
 #include "stdint.h"
 //#include "hls_fpo.h"
-//#include "hls_half.h"
+//#include "vivado/v2020_1/hls_half.h"vivado/v2020_1/
 
 ///isequal  apfixed a & apfixed b
 template <int W_, int I_>

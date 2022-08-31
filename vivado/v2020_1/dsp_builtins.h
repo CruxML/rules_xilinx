@@ -56,7 +56,7 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
-#include <ap_int.h>
+#include "ap_int.h"
 typedef ap_int<1> __dsp1_t;
 typedef ap_int<6> __dsp6_t;
 typedef ap_int<17> __dsp17_t;
@@ -66,7 +66,7 @@ typedef ap_int<27> __dsp27_t;
 typedef ap_int<30> __dsp30_t;
 typedef ap_int<48> __dsp48_t;
 #else
-#include <ap_cint.h>
+#include "ap_cint.h"
 typedef int1 __dsp1_t;
 typedef int6 __dsp6_t;
 typedef int17 __dsp17_t;

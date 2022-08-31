@@ -1572,8 +1572,8 @@ struct DataType<XF_16UC4, XF_NPPC8> {
 //#define IM_WIDTH(W,S) ((W)>>(S))
 
 // Xilinx headers
-#include <ap_int.h>
-#include <ap_fixed.h>
+#include "ap_int.h"
+#include "ap_fixed.h"
 #include <stdint.h>
 // Native types
 // typedef unsigned long     uint64_t;

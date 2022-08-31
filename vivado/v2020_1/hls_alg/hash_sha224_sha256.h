@@ -65,7 +65,7 @@
 #endif
 
 // for wide output
-#include <ap_int.h>
+#include "ap_int.h"
 
 #define ROTR(n, x) ((x >> n) | (x << (32 - n)))
 #define ROTL(n, x) ((x << n) | (x >> (32 - n)))

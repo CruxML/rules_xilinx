@@ -51,9 +51,9 @@
 #ifndef __AP_FIXED_H__
 #define __AP_FIXED_H__
 
-#include <ap_common.h>
-#include <ap_fixed_base.h>
-#include <ap_fixed_ref.h>
+#include "ap_common.h"
+#include "ap_fixed_base.h"
+#include "ap_fixed_ref.h"
 
 //---------------------------------------------------------------
 
@@ -395,7 +395,7 @@ INLINE void sc_trace(sc_core::sc_trace_file* tf,
 
 // Specialization of std containers, so that std::complex<ap_fixed> can have its
 // image part automatically zero-initialized when only real part is provided.
-#include <ap_fixed_special.h>
+#include "ap_fixed_special.h"
 
 #endif // ifndef __AP_FIXED_H__ else
 

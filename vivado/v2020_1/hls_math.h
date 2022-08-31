@@ -34,7 +34,7 @@
 #define _X_HLSTMP_MATH__
 
 #include <cmath>
-#include "hls_half.h"
+#include "vivado/v2020_1/hls_half.h"vivado/v2020_1/
 #include "hls_fpo.h"
 #include <stdint.h>
 

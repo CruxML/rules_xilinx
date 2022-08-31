@@ -62,7 +62,7 @@
 #error "C++ is required to include this header file"
 #else
 
-#include <ap_common.h>
+#include "ap_common.h"
 #ifndef __SYNTHESIS__
 #include <hls_half.h>
 #include <iostream>

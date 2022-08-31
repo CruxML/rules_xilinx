@@ -36,7 +36,7 @@ MPFR_VERSION_NUM(MPFR_VERSION_MAJOR,MPFR_VERSION_MINOR,MPFR_VERSION_PATCHLEVEL)
 
 /* Check if GMP is included, and try to include it (Works with local GMP) */
 #ifndef __GMP_H__
-# include <gmp.h>
+# include "gmp.h"
 #endif
 
 /* Check if stdio.h is included or if the user wants FILE */

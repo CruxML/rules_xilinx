@@ -1,7 +1,7 @@
 #ifndef 	HLS_MAC_PACK_H_
 #define	 	HLS_MAC_PACK_H_
 
-#include <ap_int.h>
+#include "ap_int.h"
 //#include <utils/hls_mac_pack_defines.h>
 
 
