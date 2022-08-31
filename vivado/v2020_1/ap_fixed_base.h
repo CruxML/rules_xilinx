@@ -62,7 +62,7 @@
 #include "ap_int.h"
 #ifndef __SYNTHESIS__
 // for half type
-#include <hls_half.h>
+#include "hls_half.h"
 // for std io
 #include <iostream>
 #endif

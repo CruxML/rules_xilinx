@@ -64,7 +64,7 @@
 
 #include "ap_common.h"
 #ifndef __SYNTHESIS__
-#include <hls_half.h>
+#include "hls_half.h"
 #include <iostream>
 #include <string.h>
 #endif
