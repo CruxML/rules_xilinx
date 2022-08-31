@@ -4,7 +4,7 @@ open_project -reset {{ project_name }}
 
 # The source files. Also define VITIS with cflags.
 {% for input_file in files %}
-add_files {{ input_file }} -cflags {{ cflags }}
+add_files {{ input_file }} -cflags "{{ cflags }}"
 {% endfor %}
 
 # Specify the top-level function for synthesis
