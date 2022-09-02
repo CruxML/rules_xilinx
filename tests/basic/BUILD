@@ -1,5 +1,5 @@
 load("@rules_verilog//verilog:defs.bzl", "verilog_module")
-load("@com_cruxml_rules_xilinx//xilinx:defs.bzl", "vitis_generate", "vivado_bitstream")
+load("@com_cruxml_rules_xilinx//xilinx:defs.bzl", "vitis_generate", "vivado_bitstream", "vivado_generate")
 load("@rules_verilator//verilator:defs.bzl", "verilator_cc_library")
 
 exports_files([
@@ -67,12 +67,13 @@ vitis_generate(
     deps = [":hls_adder"],
 )
 
-vitis_generate(
+vivado_generate(
     name = "gen_adder_vivado",
     out = "adder_vivado.tar.gz",
+    cflags = "-DVITIS=1 ",
     clock_period = "10.0",
-    top_func = "adder",
-    xilinx_env = "//tests:xilinx_env.sh",
+    top_func = "adder_vivado",
+    xilinx_env = "//tests:vivado_env.sh",
     deps = [":hls_adder_vivado"],
 )
 
@@ -106,7 +107,7 @@ cc_test(
 verilog_module(
     name = "adder_vivado",
     srcs = glob(["adder_vivado/*"]),
-    top = "adder",
+    top = "adder_vivado",
 )
 
 verilator_cc_library(

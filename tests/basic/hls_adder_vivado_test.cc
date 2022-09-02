@@ -10,7 +10,7 @@ TEST(hls_adder_test, one_plus_one) {
   fixed a = 1;
   fixed b = 1;
   fixed c;
-  adder(a, b, c);
+  adder_vivado(a, b, c);
   EXPECT_EQ(c, 2);
 }
 

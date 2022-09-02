@@ -15,7 +15,7 @@ HlsFileInfo = provider(
     },
 )
 
-def _hls_files_aspect_impl(target, ctx):
+def _vitis_hls_files_aspect_impl(target, ctx):
     count = 0
     files = []
 
@@ -41,8 +41,8 @@ def _hls_files_aspect_impl(target, ctx):
         files = files + dep[HlsFileInfo].files
     return [HlsFileInfo(count = count, files = files)]
 
-hls_files_aspect = aspect(
-    implementation = _hls_files_aspect_impl,
+vitis_hls_files_aspect = aspect(
+    implementation = _vitis_hls_files_aspect_impl,
     attr_aspects = ["deps"],
 )
 
@@ -99,7 +99,7 @@ vitis_generate = rule(
         "top_func": attr.string(doc = "The name of the top level function.", mandatory = True),
         "clock_period": attr.string(doc = "The clock period for the module.", mandatory = True),
         "part_number": attr.string(doc = "The part number to use. Default is ZCU111", default = "xczu28dr-ffvg1517-2-e"),
-        "deps": attr.label_list(doc = "The file to generate from", aspects = [hls_files_aspect], mandatory = True),
+        "deps": attr.label_list(doc = "The file to generate from", aspects = [vitis_hls_files_aspect], mandatory = True),
         "out": attr.output(doc = "The generated verilog files", mandatory = True),
         "template_gen": attr.label(
             doc = "The tool to use to generate run_hls.tcl.",
@@ -114,6 +114,37 @@ vitis_generate = rule(
             mandatory = True,
         ),
     },
+)
+
+def _vivado_hls_files_aspect_impl(target, ctx):
+    count = 0
+    files = []
+
+    # Make sure the rule has a srcs attribute.
+    if hasattr(ctx.rule.attr, "srcs"):
+        # Iterate through the sources counting files
+        for src in ctx.rule.attr.srcs:
+            for f in src.files.to_list():
+                if "vivado/" not in f.dirname:
+                    count = count + 1
+                    files.append(f)
+    if hasattr(ctx.rule.attr, "hdrs"):
+        # Iterate through the sources counting files
+        for src in ctx.rule.attr.hdrs:
+            for f in src.files.to_list():
+                if "vivado/" not in f.dirname:
+                    count = count + 1
+                    files.append(f)
+
+    # Get the counts from our dependencies.
+    for dep in ctx.rule.attr.deps:
+        count = count + dep[HlsFileInfo].count
+        files = files + dep[HlsFileInfo].files
+    return [HlsFileInfo(count = count, files = files)]
+
+vivado_hls_files_aspect = aspect(
+    implementation = _vivado_hls_files_aspect_impl,
+    attr_aspects = ["deps"],
 )
 
 def _vivado_generate_impl(ctx):
@@ -131,12 +162,12 @@ def _vivado_generate_impl(ctx):
     args.append(ctx.attr.top_func)
     args.append("-c")
     args.append(ctx.attr.clock_period)
+    args.append("--cf")
+    args.append(ctx.attr.cflags)
     args.append("--part_number")
     args.append(ctx.attr.part_number)
     args.append("-o")
     args.append(output_file.path)
-    args.append("--cflags")
-    args.append(ctx.attr.cflags)
 
     ctx.actions.run(
         outputs = [output_file],
@@ -170,8 +201,9 @@ vivado_generate = rule(
     attrs = {
         "top_func": attr.string(doc = "The name of the top level function.", mandatory = True),
         "clock_period": attr.string(doc = "The clock period for the module.", mandatory = True),
+        "cflags": attr.string(doc = "The compiler flags.", default = "-DVITIS=1 "),
         "part_number": attr.string(doc = "The part number to use. Default is ZCU111", default = "xczu28dr-ffvg1517-2-e"),
-        "deps": attr.label_list(doc = "The file to generate from", aspects = [hls_files_aspect], mandatory = True),
+        "deps": attr.label_list(doc = "The file to generate from", aspects = [vivado_hls_files_aspect], mandatory = True),
         "out": attr.output(doc = "The generated verilog files", mandatory = True),
         "template_gen": attr.label(
             doc = "The tool to use to generate run_hls.tcl.",
@@ -185,7 +217,6 @@ vivado_generate = rule(
             allow_files = [".sh"],
             mandatory = True,
         ),
-        "cflags": attr.string(doc = "The compiler flags.", default = "-DVITIS=1"),
     },
 )
 
