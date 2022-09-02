@@ -58,6 +58,12 @@ if __name__ == "__main__":
         required=True,
         help="The output filename to store the rendered template.",
     )
+    parser.add_argument(
+        "--cflags",
+        action="store",
+        default="-DVITIS=1",
+        help="The compiler flags to use",
+    )
     parser.add_argument("files", nargs="+", help="Files required by vitis.")
 
     options = parser.parse_args()
@@ -69,5 +75,6 @@ if __name__ == "__main__":
         "top_level_function": options.top_level_function,
         "part_number": options.part_number,
         "clock_period": options.clock_period,
+        "cflags": options.cflags,
     }
     generate_from_template(options.output_file, template_file, template_params)
