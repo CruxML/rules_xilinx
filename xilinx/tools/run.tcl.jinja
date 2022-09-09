@@ -45,7 +45,7 @@ if {[llength $run_list] != 0} {
   }
 }
 
-launch_runs $run_synth -jobs {{jobs}}
+launch_runs $run_synth -jobs {{jobs}} -verilog_define __SYNTHESIS__
 wait_on_run $run_synth
 if {[get_property PROGRESS $run_synth] != "100%"} {
   puts "ERROR: Synthesis failed"
