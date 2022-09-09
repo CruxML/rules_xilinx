@@ -276,7 +276,7 @@ def _vivado_bitstream_impl(ctx):
 
     ctx.actions.run_shell(
         outputs = [synth_dcp, route_dcp, bitstream, vivado_log],
-        inputs = ctx.attr.module[VerilogModuleInfo].files.to_list() + ctx.files.board_designs + ctx.files.constraints + [run_tcl, xilinx_env],
+        inputs = ctx.attr.module[VerilogModuleInfo].files.to_list() + ctx.attr.module[VerilogModuleInfo].data_files.to_list() + ctx.files.board_designs + ctx.files.constraints + [run_tcl, xilinx_env],
         command = command,
         mnemonic = "VivadoRun",
         use_default_shell_env = True,
