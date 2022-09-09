@@ -26,6 +26,8 @@ foreach bd [get_files -quiet "*.bd"] {
   }
 }
 
+set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-verilog_define __SYNTHESIS__} -objects [get_runs synth_1]
+
 set run_synth [get_runs "synth_1"]
 set run_list [get_runs -quiet \
             -filter "IS_SYNTHESIS == true && NAME != $run_synth"]
@@ -45,7 +47,7 @@ if {[llength $run_list] != 0} {
   }
 }
 
-launch_runs $run_synth -jobs {{jobs}} -verilog_define __SYNTHESIS__
+launch_runs $run_synth -jobs {{jobs}}
 wait_on_run $run_synth
 if {[get_property PROGRESS $run_synth] != "100%"} {
   puts "ERROR: Synthesis failed"
