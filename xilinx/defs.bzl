@@ -227,6 +227,14 @@ def _vivado_bitstream_impl(ctx):
     vivado_log = ctx.actions.declare_file("{}.log".format(ctx.label.name))
     run_tcl = ctx.actions.declare_file("run.tcl")
 
+    synth_timing_report = ctx.actions.declare_file("post_synth_timing_summary.rpt")
+    synth_util_report = ctx.actions.declare_file("post_synth_util.rpt")
+    route_status_report = ctx.actions.declare_file("post_route_status.rpt")
+    route_timing_report = ctx.actions.declare_file("post_route_timing_summary.rpt")
+    route_power_report = ctx.actions.declare_file("post_route_power.rpt")
+    route_drc_report = ctx.actions.declare_file("post_imp_drc.rpt")
+    reports = [synth_timing_report, synth_util_report, route_status_report, route_timing_report, route_power_report, route_drc_report]
+
     args = []
     if ctx.attr.module[VerilogModuleInfo].files:
         args.append("--sv_files")
@@ -275,13 +283,15 @@ def _vivado_bitstream_impl(ctx):
     command += "vivado -mode batch -source " + run_tcl.path + " -log " + vivado_log.path
 
     ctx.actions.run_shell(
-        outputs = [synth_dcp, route_dcp, bitstream, vivado_log],
+        outputs = [synth_dcp, route_dcp, bitstream, vivado_log] + reports,
         inputs = ctx.attr.module[VerilogModuleInfo].files.to_list() + ctx.attr.module[VerilogModuleInfo].data_files.to_list() + ctx.files.board_designs + ctx.files.constraints + [run_tcl, xilinx_env],
         command = command,
         mnemonic = "VivadoRun",
         use_default_shell_env = True,
         progress_message = "Building {}.bit".format(ctx.attr.module[VerilogModuleInfo].top),
     )
+
+    # TODO(stridge-cruxml) Call a python script to analyze vivado_log.path and error check.
 
     return [
         DefaultInfo(files = depset([synth_dcp, route_dcp, bitstream, vivado_log])),

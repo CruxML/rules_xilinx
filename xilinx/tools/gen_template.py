@@ -75,6 +75,7 @@ if __name__ == "__main__":
         "top_module": options.top_module,
         "part_number": options.part_number,
         "synth_dcp": options.synth_dcp,
+        "report_dir": os.path.dirname(options.synth_dcp),
         "route_dcp": options.route_dcp,
         "bitstream": options.bitstream,
         "jobs": 4,
