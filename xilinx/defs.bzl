@@ -294,7 +294,7 @@ def _vivado_bitstream_impl(ctx):
     # TODO(stridge-cruxml) Call a python script to analyze vivado_log.path and error check.
 
     return [
-        DefaultInfo(files = depset([synth_dcp, route_dcp, bitstream, vivado_log])),
+        DefaultInfo(files = depset([synth_dcp, route_dcp, bitstream, vivado_log] + reports)),
         VivadoInfo(part = ctx.attr.part_number),
     ]
 
