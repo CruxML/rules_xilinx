@@ -120,6 +120,14 @@ cc_test(
 
 See the `tests` directory for more working examples.
 
+### Opening the project in the GUI
+
+It is necessary to use the Vivado GUI at times.
+The easiest way is to just use the checkpoints that are written in bitstream creation.
+Alternatively, run the bitstream build with `--sandbox_debug`. This will keep the vivado project state when building.
+This will print a path of the working directory. In this directory, there is `myproj/project_1.xpr` which can be opened with the GUI.
+
+
 ## Design for Vivado
 
 ### Differences with rules_vivado
