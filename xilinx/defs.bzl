@@ -330,13 +330,13 @@ vivado_bitstream = rule(
             mandatory = True,
         ),
         "synth_strategy": attr.string(
-            doc = "Strategy to use at synthesis"
-            default = "Vivado Synthesis Defaults"
-        )
+            doc = "Strategy to use at synthesis",
+            default = "Vivado Synthesis Defaults",
+        ),
         "impl_strategy": attr.string(
-            doc = "Strategy to use at implementations"
-            default = "Vivado Implementation Defaults"
-        )
+            doc = "Strategy to use at implementations",
+            default = "Vivado Implementation Defaults",
+        ),
         "template_gen": attr.label(
             doc = "Tool used to generate run.tcl. A custom tool can be used.",
             executable = True,
