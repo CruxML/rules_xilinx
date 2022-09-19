@@ -32,6 +32,7 @@ set run_synth [get_runs "synth_1"]
 set run_list [get_runs -quiet \
             -filter "IS_SYNTHESIS == true && NAME != $run_synth"]
 
+set_property strategy {{synth_strategy}} $run_synth
 
 if {[llength $run_list] != 0} {
   foreach run $run_list {
@@ -59,9 +60,10 @@ write_checkpoint -force {{synth_dcp}}
 report_timing_summary -file {{report_dir}}/post_synth_timing_summary.rpt
 report_utilization -file {{report_dir}}/post_synth_util.rpt
 
-# TODO(stridge-cruxml) Create Synth reports.
-
 set run_impl [get_runs "impl_1"]
+
+set_property strategy {{impl_strategy}} $run_impl
+
 launch_runs $run_impl -jobs {{jobs}}
 wait_on_run $run_impl
 if {[get_property PROGRESS $run_impl] != "100%"} {
@@ -71,6 +73,7 @@ if {[get_property PROGRESS $run_impl] != "100%"} {
 
 open_run "impl_1"
 write_checkpoint -force {{route_dcp}}
+report_utilization -file {{report_dir}}/post_route_util.rpt
 report_route_status -file {{report_dir}}/post_route_status.rpt
 report_timing_summary -file {{report_dir}}/post_route_timing_summary.rpt
 report_power -file {{report_dir}}/post_route_power.rpt
