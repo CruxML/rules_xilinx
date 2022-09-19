@@ -232,8 +232,9 @@ def _vivado_bitstream_impl(ctx):
     route_status_report = ctx.actions.declare_file("post_route_status.rpt")
     route_timing_report = ctx.actions.declare_file("post_route_timing_summary.rpt")
     route_power_report = ctx.actions.declare_file("post_route_power.rpt")
+    route_util_report = ctx.actions.declare_file("post_route_util.rpt")
     route_drc_report = ctx.actions.declare_file("post_imp_drc.rpt")
-    reports = [synth_timing_report, synth_util_report, route_status_report, route_timing_report, route_power_report, route_drc_report]
+    reports = [synth_timing_report, synth_util_report, route_status_report, route_timing_report, route_power_report, route_drc_report, route_util_report]
 
     args = []
     if ctx.attr.module[VerilogModuleInfo].files:
@@ -265,6 +266,10 @@ def _vivado_bitstream_impl(ctx):
     args.append(bitstream.path)
     args.append("--output_file")
     args.append(run_tcl.path)
+    args.append("--synth_strategy")
+    args.append(ctx.attr.synth_strategy)
+    args.append("--impl_strategy")
+    args.append(ctx.attr.impl_strategy)
 
     ctx.actions.run(
         outputs = [run_tcl],
@@ -323,6 +328,14 @@ vivado_bitstream = rule(
             doc = "Environment variables for xilinx tools.",
             allow_files = [".sh"],
             mandatory = True,
+        ),
+        "synth_strategy": attr.string(
+            doc = "Strategy to use at synthesis",
+            default = "Vivado Synthesis Defaults",
+        ),
+        "impl_strategy": attr.string(
+            doc = "Strategy to use at implementations",
+            default = "Vivado Implementation Defaults",
         ),
         "template_gen": attr.label(
             doc = "Tool used to generate run.tcl. A custom tool can be used.",

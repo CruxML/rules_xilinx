@@ -60,6 +60,18 @@ if __name__ == "__main__":
         required=True,
         help="The output filename for the generated template.",
     )
+    parser.add_argument(
+        "--synth_strategy",
+        action="store",
+        required=True,
+        help="The vivado strategy to use at synthesis.",
+    )
+    parser.add_argument(
+        "--impl_strategy",
+        action="store",
+        required=True,
+        help="The vivado strategy to use at implementation.",
+    )
 
     parser.add_argument("--sv_files", nargs="+", help="System verilog input files.")
     parser.add_argument("--tcl_files", nargs="+", help="Tcl input files.")
@@ -78,6 +90,8 @@ if __name__ == "__main__":
         "report_dir": os.path.dirname(options.synth_dcp),
         "route_dcp": options.route_dcp,
         "bitstream": options.bitstream,
+        "synth_strategy": options.synth_strategy,
+        "impl_strategy" : options.impl_strategy,
         "jobs": 4,
     }
     generate_from_template(options.output_file, template_file, template_params)
