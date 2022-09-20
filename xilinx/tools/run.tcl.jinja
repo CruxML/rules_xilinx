@@ -26,13 +26,12 @@ foreach bd [get_files -quiet "*.bd"] {
   }
 }
 
-set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-verilog_define __SYNTHESIS__} -objects [get_runs synth_1]
-
 set run_synth [get_runs "synth_1"]
 set run_list [get_runs -quiet \
             -filter "IS_SYNTHESIS == true && NAME != $run_synth"]
 
 set_property strategy "{{synth_strategy}}" $run_synth
+set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-verilog_define __SYNTHESIS__} -objects $run_synth
 
 if {[llength $run_list] != 0} {
   foreach run $run_list {
