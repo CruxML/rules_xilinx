@@ -3,6 +3,7 @@ load("@pip//:requirements.bzl", "requirement")
 exports_files([
     "run.tcl.jinja",
     "run_hls.tcl.jinja",
+    "run_xsim.tcl.jinja",
 ])
 
 py_binary(
@@ -19,6 +20,16 @@ py_binary(
     name = "gen_hls_template",
     srcs = ["gen_hls_template.py"],
     data = [":run_hls.tcl.jinja"],
+    visibility = ["//visibility:public"],
+    deps = [
+        requirement("jinja2"),
+    ],
+)
+
+py_binary(
+    name = "gen_xsim_template",
+    srcs = ["gen_xsim_template.py"],
+    data = [":run_xsim.tcl.jinja"],
     visibility = ["//visibility:public"],
     deps = [
         requirement("jinja2"),

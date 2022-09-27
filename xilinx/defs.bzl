@@ -345,3 +345,107 @@ vivado_bitstream = rule(
         ),
     },
 )
+
+def _xsim_run_impl(ctx):
+    run_tcl = ctx.actions.declare_file("run_xsim.tcl")
+    # vivado_log = ctx.actions.declare_file("{}.log".format(ctx.label.name))
+
+    args = []
+    if ctx.attr.module[VerilogModuleInfo].files:
+        args.append("--sv_files")
+
+    for file in ctx.attr.module[VerilogModuleInfo].files.to_list():
+        args.append(file.path)
+
+    if ctx.attr.board_designs:
+        args.append("--tcl_files")
+    for target in ctx.attr.board_designs:
+        args.append(target.files.to_list()[0].path)
+
+    if ctx.attr.constraints:
+        args.append("--xdc_files")
+    for target in ctx.attr.constraints:
+        args.append(target.files.to_list()[0].path)
+
+    args.append("-t")
+    args.append(ctx.attr.module[VerilogModuleInfo].top)
+    args.append("--output_file")
+    args.append(run_tcl.path)
+    args.append("--part_number")
+    args.append(ctx.attr.part_number)
+    args.append("--verilog_flags")
+    args.append(ctx.attr.verilog_flags)
+    ctx.actions.run(
+        outputs = [run_tcl],
+        inputs = [],
+        arguments = args,
+        progress_message = "Generating run_xsim.tcl",
+        mnemonic = "GenRunXsimTcl",
+        executable = ctx.executable.template_gen,
+    )
+
+    xilinx_env_files = ctx.attr.xilinx_env.files.to_list()
+    xilinx_env = xilinx_env_files[0]
+
+    # Vivado needs HOME variable defined for the tcl store.
+    command = "source " + xilinx_env.path + " && "
+    command += "vivado -mode batch -source " + run_tcl.path + " -log " + vivado_log.path
+    ctx.actions.write(
+        output = ctx.outputs.executable,
+        content = command,
+        is_executable = True,
+    )
+
+    runfiles = ctx.runfiles()
+    transitive_runfiles = []
+    # for verilog_file in ctx.attr.module[VerilogModuleInfo].files.to_list():
+    #     runfiles.merge(verilog_file)
+
+    # transitive_runfiles = runfiles.merge(ctx.attr.module[VerilogModuleInfo].files, ctx.attr.module[VerilogModuleInfo].data_files)
+    print(ctx.attr.module[VerilogModuleInfo].files)
+    return [
+        DefaultInfo(
+            files = depset([run_tcl.path]),
+            executable = ctx.outputs.executable,
+        ),
+    ]
+
+xsim_run = rule(
+    implementation = _xsim_run_impl,
+    doc = "Test xsim.",
+    executable = True,
+    attrs = {
+        "module": attr.label(
+            doc = "Top level module.",
+            mandatory = True,
+            providers = [VerilogModuleInfo],
+        ),
+        "part_number": attr.string(
+            doc = "Xilinx part number.",
+            mandatory = True,
+        ),
+        "verilog_flags": attr.string(
+            doc = "The verilog flags to add.",
+            mandatory = False,
+        ),
+        "board_designs": attr.label_list(
+            doc = "The exported tcl for a Vivado board design.",
+            allow_files = [".tcl"],
+        ),
+        "constraints": attr.label_list(
+            doc = "Constraints for synthesis and later stages.",
+            allow_files = [".xdc"],
+        ),
+        "xilinx_env": attr.label(
+            doc = "Environment variables for xilinx tools.",
+            allow_files = [".sh"],
+            mandatory = True,
+        ),
+        "template_gen": attr.label(
+            doc = "Tool used to generate run_xsim.tcl. A custom tool can be used.",
+            executable = True,
+            cfg = "exec",
+            default = "@com_cruxml_rules_xilinx//xilinx/tools:gen_xsim_template",
+        ),
+    },
+)

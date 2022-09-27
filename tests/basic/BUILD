@@ -1,5 +1,5 @@
 load("@rules_verilog//verilog:defs.bzl", "verilog_module")
-load("@com_cruxml_rules_xilinx//xilinx:defs.bzl", "vitis_generate", "vivado_bitstream", "vivado_generate")
+load("@com_cruxml_rules_xilinx//xilinx:defs.bzl", "vitis_generate", "vivado_bitstream", "vivado_generate", "xsim_run")
 load("@rules_verilator//verilator:defs.bzl", "verilator_cc_library")
 
 exports_files([
@@ -90,6 +90,27 @@ verilator_cc_library(
     module = ":adder",
     # Disable all warnings for HLS generated verilog.
     vopts = [],
+)
+
+verilog_module(
+    name = "fifo",
+    srcs = ["fifo/fifo.sv"],
+    top = "fifo",
+)
+
+verilog_module(
+    name = "fifo_tb",
+    srcs = ["fifo/fifo_tb.sv"],
+    top = "fifo_tb",
+    deps = [":fifo"],
+)
+
+xsim_run(
+    name = "fifo_xsim_test",
+    module = ":fifo_tb",
+    part_number = "xczu49dr-ffvf1760-2-e",
+    verilog_flags = "--define PASSING_TEST",
+    xilinx_env = "//tests:xilinx_env.sh",
 )
 
 cc_test(
