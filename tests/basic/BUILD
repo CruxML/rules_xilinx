@@ -1,5 +1,5 @@
 load("@rules_verilog//verilog:defs.bzl", "verilog_module")
-load("@com_cruxml_rules_xilinx//xilinx:defs.bzl", "vitis_generate", "vivado_bitstream", "vivado_generate", "xsim_run")
+load("@com_cruxml_rules_xilinx//xilinx:defs.bzl", "vitis_generate", "vivado_bitstream", "vivado_generate", "xsim_test")
 load("@rules_verilator//verilator:defs.bzl", "verilator_cc_library")
 
 exports_files([
@@ -105,11 +105,19 @@ verilog_module(
     deps = [":fifo"],
 )
 
-xsim_run(
+xsim_test(
     name = "fifo_xsim_test",
     module = ":fifo_tb",
     part_number = "xczu49dr-ffvf1760-2-e",
     verilog_flags = "--define PASSING_TEST",
+    xilinx_env = "//tests:xilinx_env.sh",
+)
+
+xsim_test(
+    name = "fifo_xsim_fail_test",
+    module = ":fifo_tb",
+    part_number = "xczu49dr-ffvf1760-2-e",
+    verilog_flags = "",
     xilinx_env = "//tests:xilinx_env.sh",
 )
 

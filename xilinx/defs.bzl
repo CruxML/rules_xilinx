@@ -346,9 +346,9 @@ vivado_bitstream = rule(
     },
 )
 
-def _xsim_run_impl(ctx):
+def _xsim_test_impl(ctx):
     run_tcl = ctx.actions.declare_file("run_xsim.tcl")
-    # vivado_log = ctx.actions.declare_file("{}.log".format(ctx.label.name))
+    vivado_log = ctx.actions.declare_file("{}.log".format(ctx.label.name))
 
     args = []
     if ctx.attr.module[VerilogModuleInfo].files:
@@ -360,11 +360,6 @@ def _xsim_run_impl(ctx):
     if ctx.attr.board_designs:
         args.append("--tcl_files")
     for target in ctx.attr.board_designs:
-        args.append(target.files.to_list()[0].path)
-
-    if ctx.attr.constraints:
-        args.append("--xdc_files")
-    for target in ctx.attr.constraints:
         args.append(target.files.to_list()[0].path)
 
     args.append("-t")
@@ -390,30 +385,33 @@ def _xsim_run_impl(ctx):
     # Vivado needs HOME variable defined for the tcl store.
     command = "source " + xilinx_env.path + " && "
     command += "vivado -mode batch -source " + run_tcl.path + " -log " + vivado_log.path
+
+    ctx.actions.run_shell(
+        outputs = [vivado_log],
+        inputs = ctx.attr.module[VerilogModuleInfo].files.to_list() + ctx.attr.module[VerilogModuleInfo].data_files.to_list() + ctx.files.board_designs + [run_tcl, xilinx_env],
+        command = command,
+        mnemonic = "VivadoRun",
+        use_default_shell_env = True,
+        progress_message = "Building {}.bit".format(ctx.attr.module[VerilogModuleInfo].top),
+    )
+    cat_log = "pwd" + "&& " + "echo " + vivado_log.path
     ctx.actions.write(
         output = ctx.outputs.executable,
-        content = command,
+        content = cat_log,
         is_executable = True,
     )
-
-    runfiles = ctx.runfiles()
-    transitive_runfiles = []
-    # for verilog_file in ctx.attr.module[VerilogModuleInfo].files.to_list():
-    #     runfiles.merge(verilog_file)
-
-    # transitive_runfiles = runfiles.merge(ctx.attr.module[VerilogModuleInfo].files, ctx.attr.module[VerilogModuleInfo].data_files)
-    print(ctx.attr.module[VerilogModuleInfo].files)
+    print(vivado_log)
     return [
         DefaultInfo(
-            files = depset([run_tcl.path]),
+            runfiles = ctx.runfiles(files = [vivado_log]),
             executable = ctx.outputs.executable,
         ),
     ]
 
-xsim_run = rule(
-    implementation = _xsim_run_impl,
+xsim_test = rule(
+    implementation = _xsim_test_impl,
     doc = "Test xsim.",
-    executable = True,
+    test = True,
     attrs = {
         "module": attr.label(
             doc = "Top level module.",
@@ -431,10 +429,6 @@ xsim_run = rule(
         "board_designs": attr.label_list(
             doc = "The exported tcl for a Vivado board design.",
             allow_files = [".tcl"],
-        ),
-        "constraints": attr.label_list(
-            doc = "Constraints for synthesis and later stages.",
-            allow_files = [".xdc"],
         ),
         "xilinx_env": attr.label(
             doc = "Environment variables for xilinx tools.",

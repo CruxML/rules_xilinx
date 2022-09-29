@@ -22,7 +22,9 @@ module fifo #(
 
   end
   if (BUILT_IN) begin : xilinx_built_in
-    localparam ROUNDED_DATA_WIDTH = (DATA_WIDTH <= 4) ? 4 : (DATA_WIDTH <= 9) ? 9 : (DATA_WIDTH <= 18) ? 18:(DATA_WIDTH <= 36) ? 36:72;
+    localparam FIFO_DATA_WIDTH = (DATA_WIDTH <= 4) ? 4 : (DATA_WIDTH <= 9) ? 8 : (DATA_WIDTH <= 18) ? 16:(DATA_WIDTH <= 36) ? 32:64;
+    localparam FIFO_PARITY_WIDTH = (DATA_WIDTH <= 4) ? 0 : (DATA_WIDTH <= 9) ? 1 : (DATA_WIDTH <= 18) ? 2:(DATA_WIDTH <= 36) ? 4:8;
+    localparam ROUNDED_DATA_WIDTH = FIFO_DATA_WIDTH + FIFO_PARITY_WIDTH;
     logic [ROUNDED_DATA_WIDTH-1:0] data_in_tmp;
     logic [ROUNDED_DATA_WIDTH-1:0] data_out_tmp;
     logic empty;
@@ -67,8 +69,8 @@ module fifo #(
         .DBITERR(),
         .ECCPARITY(),
         .SBITERR(),
-        .DOUT(data_out_tmp[ROUNDED_DATA_WIDTH-5:0]),
-        .DOUTP(data_out_tmp[ROUNDED_DATA_WIDTH-1:ROUNDED_DATA_WIDTH-4]),
+        .DOUT(data_out_tmp[FIFO_DATA_WIDTH-1:0]),
+        .DOUTP(data_out_tmp[ROUNDED_DATA_WIDTH-1:FIFO_DATA_WIDTH]),
         .EMPTY(empty),
         .FULL(full),
         .PROGEMPTY(),
@@ -98,8 +100,8 @@ module fifo #(
         .RST(rst),
         .WRCLK(clk),
         .WREN(wen),
-        .DIN(data_in_tmp[ROUNDED_DATA_WIDTH-5:0]),
-        .DINP(data_in_tmp[ROUNDED_DATA_WIDTH-1:ROUNDED_DATA_WIDTH-4])
+        .DIN(data_in_tmp[FIFO_DATA_WIDTH-1:0]),
+        .DINP(data_in_tmp[ROUNDED_DATA_WIDTH-1:FIFO_DATA_WIDTH])
     );
 
 

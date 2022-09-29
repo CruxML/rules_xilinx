@@ -15,9 +15,6 @@ read_verilog -library xil_defaultlib -sv {
 
 set_property top {{top_module}} [current_fileset]
 
-# Constraints
-{% for xdc_file in xdc_files %}read_xdc {{xdc_file}}
-{% endfor %}
 
 foreach bd [get_files -quiet "*.bd"] {
   if {![get_property IS_GENERATED $bd]} {
@@ -36,3 +33,5 @@ set_property -name {xsim.simulate.log_all_signals} -value {true} -objects [get_f
 
 
 launch_simulation
+
+run all

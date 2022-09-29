@@ -51,7 +51,6 @@ if __name__ == "__main__":
 
     parser.add_argument("--sv_files", nargs="+", help="System verilog input files.")
     parser.add_argument("--tcl_files", nargs="+", help="Tcl input files.")
-    parser.add_argument("--xdc_files", nargs="+", help="Xdc input files.")
 
     options = parser.parse_args()
 
