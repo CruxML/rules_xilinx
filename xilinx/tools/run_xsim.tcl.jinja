@@ -24,7 +24,7 @@ foreach bd [get_files -quiet "*.bd"] {
 }
 
 update_compile_order -fileset sources_1
-
+# Set the compiler flag.
 set_property -name {xsim.compile.xvlog.more_options} -value { {{verilog_flags}} } -objects [get_filesets sim_1]
 
 set_property top {{top_module}} [get_filesets sim_1]

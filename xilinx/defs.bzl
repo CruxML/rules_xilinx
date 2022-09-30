@@ -392,18 +392,29 @@ def _xsim_test_impl(ctx):
         command = command,
         mnemonic = "VivadoRun",
         use_default_shell_env = True,
-        progress_message = "Building {}.bit".format(ctx.attr.module[VerilogModuleInfo].top),
+        progress_message = "Running xsim on {}".format(ctx.attr.module[VerilogModuleInfo].top),
     )
-    cat_log = "pwd" + "&& " + "echo " + vivado_log.path
+    log_runfiles = ctx.runfiles(files = [vivado_log])
+
+    # Way to access the runfile path.
+    log_path = vivado_log.path.replace("bazel-out/k8-fastbuild/bin/", "")
+
+    # Raise error when "Error is found in the log."
+    error_parser = "if grep -q Error {}; then\n".format(log_path)
+
+    # Use the log as the error message.
+    error_parser += "cat {}\n".format(log_path)
+    error_parser += "exit 64\n"
+    error_parser += "fi"
+
     ctx.actions.write(
         output = ctx.outputs.executable,
-        content = cat_log,
+        content = error_parser,
         is_executable = True,
     )
-    print(vivado_log)
     return [
         DefaultInfo(
-            runfiles = ctx.runfiles(files = [vivado_log]),
+            runfiles = log_runfiles,
             executable = ctx.outputs.executable,
         ),
     ]
