@@ -1,0 +1,37 @@
+
+create_project project_1 myproj -part {{part_number}}
+
+# Tcl files
+{% for tcl_file in tcl_files %}source {{tcl_file}}
+{% endfor %}
+
+# Verilog files
+{% if sv_files|length > 0 %}
+read_verilog -library xil_defaultlib -sv {
+  {% for sv_file in sv_files %}{{sv_file}}
+  {% endfor %}
+}
+{% endif %}
+
+set_property top {{top_module}} [current_fileset]
+
+
+foreach bd [get_files -quiet "*.bd"] {
+  if {![get_property IS_GENERATED $bd]} {
+    generate_target all $bd
+    create_ip_run $bd
+  }
+}
+
+update_compile_order -fileset sources_1
+# Set the compiler flag.
+set_property -name {xsim.compile.xvlog.more_options} -value { {{verilog_flags}} } -objects [get_filesets sim_1]
+
+set_property top {{top_module}} [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+set_property -name {xsim.simulate.log_all_signals} -value {true} -objects [get_filesets sim_1]
+
+
+launch_simulation
+
+run all

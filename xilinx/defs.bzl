@@ -148,6 +148,7 @@ vivado_hls_files_aspect = aspect(
 )
 
 def _vivado_generate_impl(ctx):
+    #TODO(cruxml-bopeng) fix the tcl name to remove conflicting filename error.
     output_file = ctx.actions.declare_file("run_hls.tcl")
 
     all_files = []
@@ -342,6 +343,115 @@ vivado_bitstream = rule(
             executable = True,
             cfg = "exec",
             default = "@com_cruxml_rules_xilinx//xilinx/tools:gen_template",
+        ),
+    },
+)
+
+def _xsim_test_impl(ctx):
+    run_tcl = ctx.actions.declare_file("run_xsim.tcl")
+    vivado_log = ctx.actions.declare_file("{}.log".format(ctx.label.name))
+
+    args = []
+    if ctx.attr.module[VerilogModuleInfo].files:
+        args.append("--sv_files")
+
+    for file in ctx.attr.module[VerilogModuleInfo].files.to_list():
+        args.append(file.path)
+
+    if ctx.attr.board_designs:
+        args.append("--tcl_files")
+    for target in ctx.attr.board_designs:
+        args.append(target.files.to_list()[0].path)
+
+    args.append("-t")
+    args.append(ctx.attr.module[VerilogModuleInfo].top)
+    args.append("--output_file")
+    args.append(run_tcl.path)
+    args.append("--part_number")
+    args.append(ctx.attr.part_number)
+    args.append("--verilog_flags")
+    args.append(ctx.attr.verilog_flags)
+    ctx.actions.run(
+        outputs = [run_tcl],
+        inputs = [],
+        arguments = args,
+        progress_message = "Generating run_xsim.tcl",
+        mnemonic = "GenRunXsimTcl",
+        executable = ctx.executable.template_gen,
+    )
+
+    xilinx_env_files = ctx.attr.xilinx_env.files.to_list()
+    xilinx_env = xilinx_env_files[0]
+
+    # Vivado needs HOME variable defined for the tcl store.
+    command = "source " + xilinx_env.path + " && "
+    command += "vivado -mode batch -source " + run_tcl.path + " -log " + vivado_log.path
+
+    ctx.actions.run_shell(
+        outputs = [vivado_log],
+        inputs = ctx.attr.module[VerilogModuleInfo].files.to_list() + ctx.attr.module[VerilogModuleInfo].data_files.to_list() + ctx.files.board_designs + [run_tcl, xilinx_env],
+        command = command,
+        mnemonic = "VivadoRun",
+        use_default_shell_env = True,
+        progress_message = "Running xsim on {}".format(ctx.attr.module[VerilogModuleInfo].top),
+    )
+    log_runfiles = ctx.runfiles(files = [vivado_log])
+
+    # Way to access the runfile path.
+    log_path = vivado_log.path.replace("bazel-out/k8-fastbuild/bin/", "")
+
+    # Raise error when "Error is found in the log."
+    error_parser = "if grep -q Error {}; then\n".format(log_path)
+
+    # Use the log as the error message.
+    error_parser += "cat {}\n".format(log_path)
+    error_parser += "exit 64\n"
+    error_parser += "fi"
+
+    ctx.actions.write(
+        output = ctx.outputs.executable,
+        content = error_parser,
+        is_executable = True,
+    )
+    return [
+        DefaultInfo(
+            runfiles = log_runfiles,
+            executable = ctx.outputs.executable,
+        ),
+    ]
+
+xsim_test = rule(
+    implementation = _xsim_test_impl,
+    doc = "Test xsim.",
+    test = True,
+    attrs = {
+        "module": attr.label(
+            doc = "Top level module.",
+            mandatory = True,
+            providers = [VerilogModuleInfo],
+        ),
+        "part_number": attr.string(
+            doc = "Xilinx part number.",
+            mandatory = True,
+        ),
+        "verilog_flags": attr.string(
+            doc = "The verilog flags to add.",
+            mandatory = False,
+        ),
+        "board_designs": attr.label_list(
+            doc = "The exported tcl for a Vivado board design.",
+            allow_files = [".tcl"],
+        ),
+        "xilinx_env": attr.label(
+            doc = "Environment variables for xilinx tools.",
+            allow_files = [".sh"],
+            mandatory = True,
+        ),
+        "template_gen": attr.label(
+            doc = "Tool used to generate run_xsim.tcl. A custom tool can be used.",
+            executable = True,
+            cfg = "exec",
+            default = "@com_cruxml_rules_xilinx//xilinx/tools:gen_xsim_template",
         ),
     },
 )
