@@ -148,6 +148,7 @@ vivado_hls_files_aspect = aspect(
 )
 
 def _vivado_generate_impl(ctx):
+    #TODO(cruxml-bopeng) fix the tcl name to remove conflicting filename error.
     output_file = ctx.actions.declare_file("run_hls.tcl")
 
     all_files = []
