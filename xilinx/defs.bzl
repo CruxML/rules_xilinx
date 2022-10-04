@@ -47,7 +47,7 @@ vitis_hls_files_aspect = aspect(
 )
 
 def _vitis_generate_impl(ctx):
-    output_file = ctx.actions.declare_file("run_hls.tcl")
+    output_file = ctx.actions.declare_file("run_hls{}.tcl".format(ctx.label.name))
 
     all_files = []
     for dep in ctx.attr.deps:
@@ -149,7 +149,7 @@ vivado_hls_files_aspect = aspect(
 
 def _vivado_generate_impl(ctx):
     #TODO(cruxml-bopeng) fix the tcl name to remove conflicting filename error.
-    output_file = ctx.actions.declare_file("run_hls.tcl")
+    output_file = ctx.actions.declare_file("run_hls{}.tcl".format(ctx.label.name))
 
     all_files = []
     for dep in ctx.attr.deps:
@@ -226,7 +226,7 @@ def _vivado_bitstream_impl(ctx):
     route_dcp = ctx.actions.declare_file("{}_route.dcp".format(ctx.label.name))
     bitstream = ctx.actions.declare_file("{}.bit".format(ctx.label.name))
     vivado_log = ctx.actions.declare_file("{}.log".format(ctx.label.name))
-    run_tcl = ctx.actions.declare_file("run.tcl")
+    run_tcl = ctx.actions.declare_file("run_bitstream{}.tcl".format(ctx.label.name))
 
     synth_timing_report = ctx.actions.declare_file("post_synth_timing_summary.rpt")
     synth_util_report = ctx.actions.declare_file("post_synth_util.rpt")
@@ -348,7 +348,7 @@ vivado_bitstream = rule(
 )
 
 def _xsim_test_impl(ctx):
-    run_tcl = ctx.actions.declare_file("run_xsim.tcl")
+    run_tcl = ctx.actions.declare_file("run_xsim{}.tcl".format(ctx.label.name))
     vivado_log = ctx.actions.declare_file("{}.log".format(ctx.label.name))
 
     args = []

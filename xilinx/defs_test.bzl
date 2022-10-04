@@ -15,7 +15,9 @@ def _fifo_xsim_pass_test_impl(ctx):
 
     return analysistest.end(env)
 
-fifo_xsim_pass_test = analysistest.make(_fifo_xsim_pass_test_impl)
+fifo_xsim_pass_test = analysistest.make(
+    _fifo_xsim_pass_test_impl,
+)
 
 def _test_xsim_pass_contents():
     xsim_test(
@@ -24,6 +26,7 @@ def _test_xsim_pass_contents():
         part_number = "xczu49dr-ffvf1760-2-e",
         verilog_flags = "--define PASSING_TEST",
         xilinx_env = "//tests:xilinx_env.sh",
+        tags = ["manual"],
     )
 
     fifo_xsim_pass_test(
@@ -57,7 +60,10 @@ def _fifo_xsim_fail_test_impl(ctx):
 
     return analysistest.end(env)
 
-fifo_xsim_fail_test = analysistest.make(_fifo_xsim_fail_test_impl)
+fifo_xsim_fail_test = analysistest.make(
+    _fifo_xsim_fail_test_impl,
+    expect_failure = True,
+)
 
 def _test_xsim_fail_contents():
     xsim_test(
@@ -66,6 +72,7 @@ def _test_xsim_fail_contents():
         part_number = "xczu49dr-ffvf1760-2-e",
         verilog_flags = "",
         xilinx_env = "//tests:xilinx_env.sh",
+        tags = ["manual"],
     )
 
     fifo_xsim_pass_test(
